@@ -51,6 +51,7 @@ nnom_layer_t *Conv2DTrans(uint32_t multiplier, nnom_3d_shape_t k, nnom_3d_shape_
 // https://github.com/tensorflow/tensorflow/blob/2b96f3662bd776e277f86997659e61046b56c315/tensorflow/python/layers/utils.py#L156
 uint32_t conv_trans_output_length(uint32_t input_length, uint32_t kernel_size, nnom_padding_t padding, uint32_t stride_size, uint32_t dilation)
 {
+    (void)dilation; //ignore compile error
 	input_length *= stride_size;
 	if (padding == PADDING_VALID)
 		input_length += MAX(kernel_size - stride_size, 0);
@@ -117,12 +118,12 @@ nnom_status_t conv2d_trans_run(nnom_layer_t *layer)
 	//return conv2d_run(layer);
 	
 	local_conv_trans_HWC_q7_nonsquare(
-				layer->in->tensor->p_data,
+				(int8_t *)layer->in->tensor->p_data,
 				layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
-				cl->weight->p_data, layer->out->tensor->dim[2],
+				(q7_t *)cl->weight->p_data, layer->out->tensor->dim[2],
 				cl->kernel.w, cl->kernel.h, cl->pad.w, cl->pad.h, cl->stride.w, cl->stride.h, cl->dilation.w, cl->dilation.h,
-				cl->bias->p_data, cl->bias_lshift[0], cl->output_rshift[0],
-				layer->out->tensor->p_data,
+				(q7_t *)cl->bias->p_data, cl->bias_lshift[0], cl->output_rshift[0],
+				(q7_t *)layer->out->tensor->p_data,
 				layer->out->tensor->dim[1], layer->out->tensor->dim[0], NULL, NULL);
 	return NN_SUCCESS;
 #endif

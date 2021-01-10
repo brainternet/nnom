@@ -32,14 +32,14 @@ nnom_layer_t *rnn_s(nnom_rnn_cell_t *cell, const nnom_rnn_config_t* config)
 
 	// apply a block memory for all the sub handles.
 	size_t mem_size = sizeof(nnom_rnn_layer_t) + sizeof(nnom_layer_io_t) * 2 + sizeof(nnom_buf_t);
-	layer = nnom_mem(mem_size);
+	layer = (nnom_rnn_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_rnn_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
-	comp = (void *)((uint8_t*)out + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_rnn_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	comp = (nnom_buf_t *)((uint8_t*)out + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_RNN;
@@ -60,7 +60,7 @@ nnom_layer_t *rnn_s(nnom_rnn_cell_t *cell, const nnom_rnn_config_t* config)
 	layer->return_sequence = config->return_sequence;
 	layer->stateful = config->stateful;
 	layer->go_backwards = config->go_backwards;
-	layer->super.config = (void*)config;
+	layer->super.config = (nnom_layer_config_t *)config;
 	layer->cell = cell;
 
 	// set this layer to the cell

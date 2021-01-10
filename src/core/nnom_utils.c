@@ -182,19 +182,19 @@ void prediction_matrix(nnom_predict_t *pre)
 	// print titles
 	NNOM_LOG("\nConfusion matrix:\n");
 	NNOM_LOG("predict");
-	for (int i = 0; i < pre->label_num; i++)
+	for (uint32_t i = 0; i < pre->label_num; i++)
 	{
 		NNOM_LOG("%6d", i);
 	}
 	NNOM_LOG("\n");
 	NNOM_LOG("actual\n");
 	// print the matrix
-	for (int i = 0; i < pre->label_num; i++)
+	for (uint32_t i = 0; i < pre->label_num; i++)
 	{
 		uint32_t row_total = 0;
 
 		NNOM_LOG(" %3d | ", i);
-		for (int j = 0; j < pre->label_num; j++)
+		for (uint32_t j = 0; j < pre->label_num; j++)
 		{
 			row_total += pre->confusion_mat[i * pre->label_num + j];
 			NNOM_LOG("%6d", pre->confusion_mat[i * pre->label_num + j]);
@@ -212,7 +212,7 @@ void prediction_top_k(nnom_predict_t *pre)
 	if (!pre)
 		return;
 
-	for (int i = 0; i < pre->top_k_size; i++)
+	for (uint32_t i = 0; i < pre->top_k_size; i++)
 	{
 		top += pre->top_k[i];
 		if (top != pre->predict_count)
@@ -266,7 +266,7 @@ nnom_status_t nnom_predict(nnom_model_t *m, uint32_t *label, float *prob)
 	model_run(m);
 
 	// get the output memory
-	output = m->tail->out->tensor->p_data;
+	output = (int8_t *)m->tail->out->tensor->p_data;
 
 	// multiple neural output
 	if (tensor_size(m->tail->out->tensor) > 1)

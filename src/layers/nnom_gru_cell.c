@@ -27,14 +27,14 @@
 nnom_rnn_cell_t *gru_cell_s(const nnom_gru_cell_config_t* config)
 {
 	nnom_gru_cell_t *cell;
-	cell = nnom_mem(sizeof(nnom_gru_cell_t));
+	cell = (nnom_gru_cell_t *)nnom_mem(sizeof(nnom_gru_cell_t));
 	if (cell == NULL)
 		return NULL;
 	// set methods
 	cell->super.run = gru_cell_run;
 	cell->super.build = gru_cell_build;
 	cell->super.free = gru_cell_free;
-	cell->super.config = (void*) config;
+	cell->super.config = (nnom_layer_config_t *) config;
 	cell->super.units = config->units;
     cell->super.type = NNOM_GRU_CELL;
 
@@ -52,6 +52,7 @@ nnom_rnn_cell_t *gru_cell_s(const nnom_gru_cell_config_t* config)
 
 nnom_status_t gru_cell_free(nnom_rnn_cell_t* cell)
 {
+    cell = cell; //ingore compile error
 	return NN_SUCCESS;
 }
 
@@ -143,7 +144,7 @@ nnom_status_t gru_cell_run(nnom_rnn_cell_t* cell)
     q15_t *in_q15_buf = (q15_t*)layer->comp->mem->blk + cell->units*9;
 
     // input q7 cast to q15
-    local_q7_to_q15(cell->in_data, in_q15_buf, cell->feature_size);
+    local_q7_to_q15((q7_t *)cell->in_data, (q15_t *)in_q15_buf, cell->feature_size);
 
     // matrix_x = K.dot(cell_inputs, kernel) + bias  --> buf0
 	#ifdef NNOM_USING_CMSIS_NN
@@ -151,8 +152,8 @@ nnom_status_t gru_cell_run(nnom_rnn_cell_t* cell)
 	#else
 		local_fully_connected_mat_q7_vec_q15_opt
 	#endif 
-		(in_q15_buf, c->weights->p_data, cell->feature_size, 
-			cell->units*3, c->bias_shift + 8, c->oshift_iw, bias, buf[0], NULL);
+		((q15_t *)in_q15_buf, (q7_t *)c->weights->p_data, cell->feature_size, 
+			cell->units*3, c->bias_shift + 8, c->oshift_iw, (q7_t *)bias, buf[0], NULL);
 
     // matrix_intter = K.dot(h_tm1, recurrent_kernel) + bias -> buf1
     #ifdef NNOM_USING_CMSIS_NN
@@ -160,8 +161,8 @@ nnom_status_t gru_cell_run(nnom_rnn_cell_t* cell)
 	#else
 		local_fully_connected_mat_q7_vec_q15_opt
 	#endif 
-		(h_tm1, c->recurrent_weights->p_data, cell->units, 
-			cell->units*3,  c->bias_shift + 8, c->oshift_hw, recurrent_bias, buf[1], NULL); 
+		((q15_t *)h_tm1, (q7_t *)c->recurrent_weights->p_data, cell->units, 
+			cell->units*3,  c->bias_shift + 8, c->oshift_hw, (q7_t *)recurrent_bias, buf[1], NULL); 
 
 	// split to each gate
     x_z = buf[0];
@@ -206,7 +207,7 @@ nnom_status_t gru_cell_run(nnom_rnn_cell_t* cell)
     local_add_q15(temp[2], temp[0], h_t, 0, cell->units);
 
     // finally, copy and convert state to output
-    local_q15_to_q7(h_t, cell->out_data, 8, cell->units);
+    local_q15_to_q7((q15_t *)h_t, (q7_t *)cell->out_data, 8, cell->units);
 	return NN_SUCCESS;
 }
 

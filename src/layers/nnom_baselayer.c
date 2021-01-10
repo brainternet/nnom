@@ -25,7 +25,7 @@ nnom_layer_t *baselayer_s(const nnom_layer_config_t * config)
 {
 	nnom_layer_t *layer = BaseLayer();
 	if(layer)
-		layer->config = (void*) config;
+		layer->config = (nnom_layer_config_t *) config;
 	return layer;
 }
 
@@ -36,13 +36,13 @@ nnom_layer_t *BaseLayer()
 
 	// apply a block memory for all the sub handles.
 	size_t mem_size = sizeof(nnom_io_layer_t) + sizeof(nnom_layer_io_t) * 2;
-	layer = nnom_mem(mem_size);
+	layer = (nnom_io_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_io_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_io_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_BASE;

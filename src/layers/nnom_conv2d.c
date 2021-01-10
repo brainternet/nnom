@@ -35,14 +35,14 @@ nnom_layer_t *conv2d_s(const nnom_conv2d_config_t *config)
 
 	// allocate a block memory for all the sub handles and shifts.
 	mem_size = sizeof(nnom_conv2d_layer_t) + sizeof(nnom_layer_io_t) * 2 + sizeof(nnom_buf_t);
-	layer = nnom_mem(mem_size);
+	layer = (nnom_conv2d_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 	
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_conv2d_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
-	comp = (void *)((uint8_t*)out + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_conv2d_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	comp = (nnom_buf_t *)((uint8_t*)out + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_CONV_2D;
@@ -62,7 +62,7 @@ nnom_layer_t *conv2d_s(const nnom_conv2d_config_t *config)
 	layer->super.free = conv2d_free;
 
 	// save the config
-	layer->super.config = (void*) config;
+	layer->super.config = (nnom_layer_config_t *) config;
 
 	// get the private parameters
 	// test: for 1d input, expend h = 1
@@ -113,14 +113,14 @@ nnom_layer_t *Conv2D(uint32_t filters, nnom_3d_shape_t k, nnom_3d_shape_t s, nno
 	nnom_layer_io_t *in, *out;
 	// apply a block memory for all the sub handles.
 	size_t mem_size = sizeof(nnom_conv2d_layer_t) + sizeof(nnom_layer_io_t) * 2 + sizeof(nnom_buf_t);
-	layer = nnom_mem(mem_size);
+	layer = (nnom_conv2d_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_conv2d_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
-	comp = (void *)((uint8_t*)out + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_conv2d_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	comp = (nnom_buf_t *)((uint8_t*)out + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_CONV_2D;
@@ -410,21 +410,21 @@ nnom_status_t conv2d_run(nnom_layer_t *layer)
 
         if(layer->in->tensor->bitwidth == 16) 
     	local_convolve_HWC_q15_nonsquare(
-				layer->in->tensor->p_data,
+				(q15_t *)layer->in->tensor->p_data,
 				layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
-				cl->weight->p_data, layer->out->tensor->dim[2],
+				(q7_t *)cl->weight->p_data, layer->out->tensor->dim[2],
 				cl->kernel.w, cl->kernel.h, cl->pad.w, cl->pad.h, cl->stride.w, cl->stride.h, cl->dilation.w, cl->dilation.h,
-				cl->bias->p_data, cl->bias_lshift, cl->output_rshift, cl->weight->qtype,
-				layer->out->tensor->p_data,
+				(q7_t *)cl->bias->p_data, cl->bias_lshift, cl->output_rshift, cl->weight->qtype,
+				(q15_t *)layer->out->tensor->p_data,
 				layer->out->tensor->dim[1], layer->out->tensor->dim[0], NULL, NULL);
         else
 		local_convolve_HWC_q7_nonsquare(
-					layer->in->tensor->p_data,
+					(q7_t *)layer->in->tensor->p_data,
 					layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
-					cl->weight->p_data, layer->out->tensor->dim[2],
+					(q7_t *)cl->weight->p_data, layer->out->tensor->dim[2],
 					cl->kernel.w, cl->kernel.h, cl->pad.w, cl->pad.h, cl->stride.w, cl->stride.h, cl->dilation.w, cl->dilation.h,
-					cl->bias->p_data, cl->bias_lshift, cl->output_rshift, cl->weight->qtype,
-					layer->out->tensor->p_data,
+					(q7_t *)cl->bias->p_data, cl->bias_lshift, cl->output_rshift, cl->weight->qtype,
+					(q7_t *)layer->out->tensor->p_data,
 					layer->out->tensor->dim[1], layer->out->tensor->dim[0], NULL, NULL);
 		return NN_SUCCESS;
 	}

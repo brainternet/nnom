@@ -30,14 +30,14 @@
 nnom_rnn_cell_t *simple_cell_s(const nnom_simple_cell_config_t* config)
 {
 	nnom_simple_cell_t *cell;
-	cell = nnom_mem(sizeof(nnom_simple_cell_t));
+	cell = (nnom_simple_cell_t *)nnom_mem(sizeof(nnom_simple_cell_t));
 	if (cell == NULL)
 		return NULL;
 	// set methods
 	cell->super.run = simple_cell_run;
 	cell->super.build = simple_cell_build;
 	cell->super.free = simple_cell_free;
-	cell->super.config = (void*) config;
+	cell->super.config = (nnom_layer_config_t *) config;
 	cell->super.units = config->units;
 	cell->super.type = NNOM_SIMPLE_CELL;
 
@@ -56,6 +56,7 @@ nnom_rnn_cell_t *simple_cell_s(const nnom_simple_cell_config_t* config)
 
 nnom_status_t simple_cell_free(nnom_rnn_cell_t* cell)
 {
+    cell = cell; //ingore compile error
 	return NN_SUCCESS;
 }
 
@@ -118,19 +119,19 @@ nnom_status_t simple_cell_run(nnom_rnn_cell_t* cell)
 	int act_int_bit = 7 - MIN(c->q_dec_hw, c->q_dec_iw);
 
 	// in_state x recurrent_weight -> h2 (output buf)
-	local_dot_q7_opt(cell->in_state, c->recurrent_weights->p_data, cell->units, cell->units, c->oshift_hw, cell->out_data);
+	local_dot_q7_opt((q7_t *)cell->in_state, (q7_t *)c->recurrent_weights->p_data, cell->units, cell->units, c->oshift_hw, (q7_t *)cell->out_data);
 	// (input x weight) + bias -> h (in_state buf)
-	local_fully_connected_q7_opt(cell->in_data, c->weights->p_data, 
-				cell->feature_size, cell->units, c->bias_shift, c->oshift_iw, c->bias->p_data, cell->in_state, NULL);
+	local_fully_connected_q7_opt((q7_t *)cell->in_data, (q7_t *)c->weights->p_data, 
+				cell->feature_size, cell->units, c->bias_shift, c->oshift_iw, (q7_t *)c->bias->p_data, (q7_t *)cell->in_state, NULL);
 	// h + h2 -> (out_state buf)
-	local_add_q7(cell->in_state, cell->out_data, cell->out_state, 0, cell->units);
+	local_add_q7((q7_t *)cell->in_state, (q7_t *)cell->out_data, (q7_t *)cell->out_state, 0, cell->units);
 
 	// active(out_state buf)
 	if(c->act_type == ACT_TANH)
-		local_tanh_q7(cell->out_state, cell->units, act_int_bit);
+		local_tanh_q7((q7_t *)cell->out_state, cell->units, act_int_bit);
 		//local_hard_tanh_q7(cell->out_state, cell->units, act_int_bit);
 	else
-		local_sigmoid_q7(cell->out_state, cell->units, act_int_bit);
+		local_sigmoid_q7((q7_t *)cell->out_state, cell->units, act_int_bit);
 		//local_hard_sigmoid_q7(cell->out_state, cell->units, act_int_bit);
 
 	// (out_state buf) --copy--> (output buf)

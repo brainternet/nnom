@@ -68,7 +68,7 @@ nnom_tensor_t* new_tensor(nnom_qtype_t type, uint32_t num_dim, uint32_t num_chan
 		return NULL;
 	}
 
-	t = nnom_mem(nnom_alignto(sizeof(nnom_tensor_t), NNOM_ALIGN) 
+	t = (nnom_tensor_t *)nnom_mem(nnom_alignto(sizeof(nnom_tensor_t), NNOM_ALIGN) 
 							+ num_dim*sizeof(nnom_shape_data_t) 
 							+ q_len*sizeof(nnom_qformat_param_t)*2);
 	if(t == NULL)
@@ -161,8 +161,8 @@ nnom_tensor_t* tensor_cpy_attr(nnom_tensor_t* des, nnom_tensor_t* src)
 // the shape of the data, input data, output data
 void tensor_hwc2chw_q7(nnom_tensor_t* des, nnom_tensor_t* src)
 {
-	q7_t* p_out = des->p_data;
-	q7_t* p_in = src->p_data;
+	q7_t* p_out = (q7_t* )des->p_data;
+	q7_t* p_in = (q7_t* )src->p_data;
 
 	for (int c = 0; c < src->dim[2]; c++)
 	{
@@ -182,8 +182,8 @@ void tensor_hwc2chw_q7(nnom_tensor_t* des, nnom_tensor_t* src)
 // change format from CHW to HWC
 void tensor_chw2hwc_q7(nnom_tensor_t* des, nnom_tensor_t* src)
 {
-	q7_t* p_out = des->p_data;
-	q7_t* p_in = src->p_data;
+	q7_t* p_out = (q7_t* )des->p_data;
+	q7_t* p_in = (q7_t* )src->p_data;
 	int im_size;
 	int h_step;
 

@@ -561,8 +561,8 @@ void local_convolve_CHW_q15_nonsquare(const q15_t *Im_in,                // inpu
     }
 }
 
-#define FALSE 0
-#define TRUE 1
+//#define FALSE 0
+//#define TRUE 1
 
 static int alg_deconv2d_calculate_position(
 		int pos,
@@ -1277,7 +1277,7 @@ void local_fully_connected_mat_q7_vec_q15(const q15_t * pV,
 void local_softmax_q15(const q15_t * vec_in, const uint16_t dim_vec, q15_t * p_out)
 {
     q31_t     sum;
-    int16_t   i;
+    uint16_t   i;
     uint8_t   shift;
     q31_t     base;
     base = -1 * 0x100000;
@@ -1341,7 +1341,7 @@ void local_hard_sigmoid_q15(q15_t *data, uint32_t size, int16_t dec_bit)
 	int16_t mult = 6554;  	// 0.2 * 32768
 
 	// int bit >= 0
-	for(int i=0; i<size; i++)
+	for(uint32_t i=0; i<size; i++)
 	{
 		if(data[i] <= -limit)
 			data[i] = 0;
@@ -1368,7 +1368,7 @@ void local_hard_tanh_q15(q15_t *data, uint32_t size, int16_t dec_bit)
 	
 	// int bit < 0
 	if(int_bit < 0)
-		for(int i=0; i<size; i++)
+		for(uint32_t i=0; i<size; i++)
 		{
 			if(data[i] <= -limit)
 				data[i] = -32768;
@@ -1381,7 +1381,7 @@ void local_hard_tanh_q15(q15_t *data, uint32_t size, int16_t dec_bit)
 		}
 	else
 		// int bit >= 0
-		for(int i=0; i<size; i++)
+		for(uint32_t i=0; i<size; i++)
 		{
 			if(data[i] <= -limit)
 				data[i] = -32768;
@@ -1582,7 +1582,7 @@ void local_multiple_sub_q15( q15_t *p_dst,
 void local_1_minor_z_q15(q15_t* src, q15_t*des, uint16_t dec_bit, uint32_t size)
 {
     int32_t one = (1 << dec_bit)-1;
-    for(int i=0; i<size/8; i++)
+    for(uint32_t i=0; i<size/8; i++)
     {
         *des++ = one - *src++;
         *des++ = one - *src++;
@@ -1593,7 +1593,7 @@ void local_1_minor_z_q15(q15_t* src, q15_t*des, uint16_t dec_bit, uint32_t size)
         *des++ = one - *src++;
         *des++ = one - *src++;
     }
-    for(int i=0; i<size%8; i++)
+    for(uint32_t i=0; i<size%8; i++)
     {
         *des++ = one - *src++;
     }

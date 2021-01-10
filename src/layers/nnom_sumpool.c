@@ -36,7 +36,7 @@ nnom_layer_t *sumpool_s(const nnom_pool_config_t * config)
 	}
 	if(cl)
 	{
-		cl->super.config = (void*) config;
+		cl->super.config = (nnom_layer_config_t *) config;
 		cl->output_shift = config->output_shift; // no idea if we need it
 	}
 	return (nnom_layer_t *)cl;
@@ -91,14 +91,14 @@ nnom_status_t sumpool_run(nnom_layer_t *layer)
 #else
 	local_sumpool_q7_HWC(
 #endif
-			layer->in->tensor->p_data, 				
+			(q7_t *)layer->in->tensor->p_data, 				
 			layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
 			cl->kernel.w, cl->kernel.h, 
 			cl->pad.w, cl->pad.h,
 			cl->stride.w, cl->stride.h,
 			out_x, out_y,
-			layer->comp->mem->blk,
-			layer->out->tensor->p_data);
+			(q7_t *)layer->comp->mem->blk,
+			(q7_t *)layer->out->tensor->p_data);
 
 	return NN_SUCCESS;
 }

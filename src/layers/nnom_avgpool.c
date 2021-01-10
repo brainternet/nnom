@@ -43,7 +43,7 @@ nnom_layer_t *avgpool_s(const nnom_pool_config_t * config)
 	
 	if(cl)
 	{
-		cl->super.config = (void*) config;
+		cl->super.config = (nnom_layer_config_t *) config;
 		cl->output_shift = config->output_shift; // no idea if we need it
 	}
 	return (nnom_layer_t *)cl;
@@ -108,7 +108,7 @@ nnom_status_t avgpool_run(nnom_layer_t *layer)
 			NULL,
 			layer->out->tensor->p_data);
 #else
-    local_avepool_q15_HWC(layer->in->tensor->p_data, 				
+    local_avepool_q15_HWC((q15_t *)layer->in->tensor->p_data, 				
             layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
             cl->kernel.w, cl->kernel.h, 
             cl->pad.w, cl->pad.h,
@@ -116,13 +116,13 @@ nnom_status_t avgpool_run(nnom_layer_t *layer)
             out_x, out_y,
             cl->output_shift,
             NULL,
-            layer->out->tensor->p_data);
+            (q15_t *)layer->out->tensor->p_data);
 #endif
     }
     // 8bit
 	else{
 #ifdef NNOM_USING_CHW
-	local_avepool_q7_CHW(layer->in->tensor->p_data, 				
+	local_avepool_q7_CHW((q7_t *)layer->in->tensor->p_data, 				
 			layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
 			cl->kernel.w, cl->kernel.h, 
 			cl->pad.w, cl->pad.h,
@@ -130,7 +130,7 @@ nnom_status_t avgpool_run(nnom_layer_t *layer)
 			out_x, out_y,
 			cl->output_shift,
 			NULL,
-			layer->out->tensor->p_data);
+			(q7_t *)layer->out->tensor->p_data);
 #else //end of CHW
 	#ifdef NNOM_USING_CMSIS_NN
 	// 2D, square
@@ -139,19 +139,19 @@ nnom_status_t avgpool_run(nnom_layer_t *layer)
 		cl->output_shift == 0)
 	{
 		arm_avepool_q7_HWC(
-			layer->in->tensor->p_data,
+			(q7_t *)layer->in->tensor->p_data,
 			layer->in->tensor->dim[1], layer->in->tensor->dim[2],
 			cl->kernel.w, cl->pad.w, cl->stride.w,
 			layer->out->tensor->dim[1],
 			layer->comp->mem->blk,
-			layer->out->tensor->p_data);
+			(q7_t *)layer->out->tensor->p_data);
 	}
 	// none square 2D, or 1D
 	else
 	#endif
 	{
 		// CMSIS-NN does not support none-square pooling, we have to use local implementation
-		local_avepool_q7_HWC(layer->in->tensor->p_data, 				
+		local_avepool_q7_HWC((q7_t *)layer->in->tensor->p_data, 				
 				layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
 				cl->kernel.w, cl->kernel.h, 
 				cl->pad.w, cl->pad.h,
@@ -159,7 +159,7 @@ nnom_status_t avgpool_run(nnom_layer_t *layer)
 				out_x, out_y,
 				cl->output_shift,
 				NULL,
-				layer->out->tensor->p_data);
+				(q7_t *)layer->out->tensor->p_data);
 	}
 #endif
     }

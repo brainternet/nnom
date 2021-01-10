@@ -23,7 +23,7 @@ nnom_layer_t *upsample_s(const nnom_upsample_config_t *config)
 {
 	nnom_layer_t *layer = UpSample(kernel(config->kernel[0], config->kernel[1]));
 	if(layer)
-		layer->config = (void*) config;
+		layer->config = (nnom_layer_config_t *) config;
 	return layer;
 }
 
@@ -35,13 +35,13 @@ nnom_layer_t *UpSample(nnom_3d_shape_t kernel)
 
 	// apply a block memory for all the sub handles.
 	size_t mem_size = sizeof(nnom_upsample_layer_t) + sizeof(nnom_layer_io_t) * 2;
-	layer = nnom_mem(mem_size);
+	layer = (nnom_upsample_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_upsample_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_upsample_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_UPSAMPLE;
@@ -94,11 +94,11 @@ nnom_status_t upsample_run(nnom_layer_t *layer)
 #else
 	local_up_sampling_q7_HWC(
 #endif
-			layer->in->tensor->p_data, 				
+			(q7_t *)layer->in->tensor->p_data, 				
 			layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
 			cl->kernel.w, cl->kernel.h, 
 			layer->out->tensor->dim[1], layer->out->tensor->dim[0],
 			NULL,
-			layer->out->tensor->p_data);
+			(q7_t *)layer->out->tensor->p_data);
 	return NN_SUCCESS;
 }

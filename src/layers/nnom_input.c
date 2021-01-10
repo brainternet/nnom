@@ -24,13 +24,13 @@ nnom_layer_t *input_s(const nnom_io_config_t* config)
 	nnom_io_layer_t *layer;
 	nnom_layer_io_t *in, *out;
 	// apply a block memory for all the sub handles.
-	layer = nnom_mem(sizeof(nnom_io_layer_t) + sizeof(nnom_layer_io_t) * 2);
+	layer = (nnom_io_layer_t *)nnom_mem(sizeof(nnom_io_layer_t) + sizeof(nnom_layer_io_t) * 2);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_io_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_io_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_INPUT;
@@ -76,13 +76,13 @@ nnom_layer_t *Input(nnom_3d_shape_t input_shape, void *p_buf)
 	nnom_layer_io_t *in, *out;
 
 	// apply a block memory for all the sub handles.
-	layer = nnom_mem(sizeof(nnom_io_layer_t) + sizeof(nnom_layer_io_t) * 2);
+	layer = (nnom_io_layer_t *)nnom_mem(sizeof(nnom_io_layer_t) + sizeof(nnom_layer_io_t) * 2);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_io_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_io_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_INPUT;

@@ -32,14 +32,14 @@ nnom_layer_t *dense_s(const nnom_dense_config_t *config)
 
 	// apply a block memory for all the sub handles.
 	size_t mem_size = sizeof(nnom_dense_layer_t) + sizeof(nnom_layer_io_t) * 2 + sizeof(nnom_buf_t);
-	layer = nnom_mem(mem_size);
+	layer = (nnom_dense_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_dense_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
-	comp = (void *)((uint8_t*)out + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_dense_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	comp = (nnom_buf_t *)((uint8_t*)out + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_DENSE;
@@ -64,7 +64,7 @@ nnom_layer_t *dense_s(const nnom_dense_config_t *config)
 	layer->output_rshift = (nnom_qformat_param_t *)config->output_shift;
 	layer->bias_lshift = (nnom_qformat_param_t *)config->bias_shift;
 	// set config
-	layer->super.config = (void*) config;
+	layer->super.config = (nnom_layer_config_t *) config;
 
 	return (nnom_layer_t *)layer;
 }
@@ -77,14 +77,14 @@ nnom_layer_t *Dense(size_t output_unit, const nnom_weight_t *w, const nnom_bias_
 
 	// apply a block memory for all the sub handles.
 	size_t mem_size = sizeof(nnom_dense_layer_t) + sizeof(nnom_layer_io_t) * 2 + sizeof(nnom_buf_t);
-	layer = nnom_mem(mem_size);
+	layer = (nnom_dense_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_dense_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
-	comp = (void *)((uint8_t*)out + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_dense_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	comp = (nnom_buf_t *)((uint8_t*)out + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_DENSE;
@@ -196,12 +196,12 @@ nnom_status_t dense_run(nnom_layer_t *layer)
 		local_fully_connected_q7_opt(
 	#endif
 #endif
-			layer->in->tensor->p_data,
-			cl->weight->p_data,
+			(q7_t *)layer->in->tensor->p_data,
+			(q7_t *)cl->weight->p_data,
 			tensor_size(layer->in->tensor), layer->out->tensor->dim[0],
 			bias_shift, output_shift,
-			cl->bias->p_data,
-			layer->out->tensor->p_data, (q15_t *)(layer->comp->mem->blk));
+			(q7_t *)cl->bias->p_data,
+			(q7_t *)layer->out->tensor->p_data, (q15_t *)(layer->comp->mem->blk));
 	return result;
 }
 

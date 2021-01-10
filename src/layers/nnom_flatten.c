@@ -23,7 +23,7 @@ nnom_layer_t *flatten_s(const nnom_flatten_config_t *config)
 {
 	nnom_layer_t *layer = Flatten();
 	if(layer)
-		layer->config = (void*) config;
+		layer->config = (nnom_layer_config_t*) config;
 	return layer;
 }
 
@@ -34,13 +34,13 @@ nnom_layer_t *Flatten(void)
 
 	// apply a block memory for all the sub handles.
 	size_t mem_size = sizeof(nnom_layer_t) + sizeof(nnom_layer_io_t) * 2;
-	layer = nnom_mem(mem_size);
+	layer = (nnom_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->type = NNOM_FLATTEN;
@@ -76,6 +76,7 @@ nnom_status_t flatten_build(nnom_layer_t *layer)
 
 nnom_status_t flatten_run(nnom_layer_t *layer)
 {
+    layer = layer; //ignore compile error
 	#ifdef NNOM_USING_CHW
 	// CHW format must reorder to HWC for dense layer and all other 1D layer (?)
 	tensor_chw2hwc_q7(layer->out->tensor, layer->in->tensor);

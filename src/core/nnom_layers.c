@@ -74,7 +74,7 @@ nnom_layer_io_t *io_add_aux(nnom_layer_io_t *targeted_io)
 	if (targeted_io == NULL || targeted_io->owner == NULL || targeted_io->aux != NULL)
 		return NULL;
 	// create new io, init it
-	new_io = nnom_mem(sizeof(nnom_layer_io_t));
+	new_io = (nnom_layer_io_t *)nnom_mem(sizeof(nnom_layer_io_t));
 	if (new_io == NULL)
 		return NULL;
 	// add to aux

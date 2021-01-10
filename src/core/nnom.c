@@ -53,6 +53,12 @@ void* nnom_malloc(size_t size)
     }
 }
 void nnom_free(void* p){;}
+void nnom_memset(void* ptr, int value, size_t num)
+{
+    uint8_t *p = ptr;
+    while(num--)
+        *p++=value;
+}
 #endif // NNOM_USING_STATIC_MEMORY
 
 void *nnom_mem(size_t size)
@@ -171,7 +177,7 @@ static nnom_layer_hook_t *allocate_hook(nnom_layer_io_t *io)
 		{
 			hook = hook->next;
 		}
-		hook->next = nnom_mem(sizeof(nnom_layer_hook_t));
+		hook->next = (nnom_layer_hook_t *)nnom_mem(sizeof(nnom_layer_hook_t));
 		if (hook->next == NULL)
 			return NULL;
 		return hook->next;
@@ -198,7 +204,7 @@ static nnom_layer_io_t *allocate_io(nnom_layer_io_t *io)
 		{
 			io = io->aux;
 		}
-		io->aux = nnom_mem(sizeof(nnom_layer_io_t));
+		io->aux = (nnom_layer_io_t *)nnom_mem(sizeof(nnom_layer_io_t));
 		if (io->aux == NULL)
 			return NULL;
 		// the owner for new io is inherited
@@ -273,7 +279,7 @@ nnom_model_t *new_model(nnom_model_t *model)
 	nnom_model_t *m = model;
 	if (m == NULL)
 	{
-		m = nnom_mem(sizeof(nnom_model_t));
+		m = (nnom_model_t *)nnom_mem(sizeof(nnom_model_t));
 		m->is_allocated = true;
 	}
 	else
@@ -966,7 +972,7 @@ nnom_status_t model_compile(nnom_model_t *m, nnom_layer_t *input, nnom_layer_t *
 	buf_size = mem_analysis_result(m);
 
 	// allocate one big memory block
-	buf = nnom_mem(buf_size);
+	buf = (uint8_t *)nnom_mem(buf_size);
 	if (buf == NULL)
 	{
 		NNOM_LOG("ERROR: No enough memory for network buffer, required %d bytes\n", (uint32_t)buf_size);
@@ -1098,7 +1104,7 @@ nnom_status_t check_model_version(unsigned long model_version)
 	if(model_version != NNOM_VERSION)
 	{
 		NNOM_LOG("WARNING: model version %d.%d.%d dosen't match nnom version!\n", major, sub, rev);
-		result = -NN_ARGUMENT_ERROR;
+		result = NN_ARGUMENT_ERROR;
 	}
 	else
 	{

@@ -30,14 +30,14 @@
 nnom_rnn_cell_t *lstm_cell_s(const nnom_lstm_cell_config_t* config)
 {
 	nnom_lstm_cell_t *cell;
-	cell = nnom_mem(sizeof(nnom_lstm_cell_t));
+	cell = (nnom_lstm_cell_t *)nnom_mem(sizeof(nnom_lstm_cell_t));
 	if (cell == NULL)
 		return NULL;
 	// set methods
 	cell->super.run = lstm_cell_q7_q15_run;
 	cell->super.build = lstm_cell_q7_q15_build;
 	cell->super.free = lstm_cell_free;
-	cell->super.config = (void*) config;
+	cell->super.config = (nnom_layer_config_t *) config;
 	cell->super.units = config->units;
     cell->super.type = NNOM_LSTM_CELL;
 
@@ -56,6 +56,7 @@ nnom_rnn_cell_t *lstm_cell_s(const nnom_lstm_cell_config_t* config)
 
 nnom_status_t lstm_cell_free(nnom_rnn_cell_t* cell)
 {
+    cell = cell; //ingore compile error
 	return NN_SUCCESS;
 }
 
@@ -142,7 +143,7 @@ nnom_status_t lstm_cell_q7_q15_run(nnom_rnn_cell_t* cell)
     in_q15_buf = (q15_t*)layer->comp->mem->blk + cell->units*12;
 
     // input q7 -> q15
-    local_q7_to_q15(cell->in_data, in_q15_buf, cell->feature_size);
+    local_q7_to_q15((q7_t *)cell->in_data, (q15_t *)in_q15_buf, cell->feature_size);
 
     // z1 = K.dot(cell_inputs, kernel) + bias -> buf1
 	#ifdef NNOM_USING_CMSIS_NN
@@ -150,12 +151,12 @@ nnom_status_t lstm_cell_q7_q15_run(nnom_rnn_cell_t* cell)
 	#else
 		local_fully_connected_mat_q7_vec_q15_opt
 	#endif 
-		(in_q15_buf, c->weights->p_data, cell->feature_size, cell->units*4, c->bias_shift + 8, c->oshift_iw, c->bias->p_data, buf1, NULL);
+		((q15_t *)in_q15_buf, (q7_t *)c->weights->p_data, cell->feature_size, cell->units*4, c->bias_shift + 8, c->oshift_iw, (q7_t *)c->bias->p_data, (q15_t *)buf1, NULL);
 
     // z2 = K.dot(h_tm1, recurrent_kernel)  -> buf2
 	// --- arm version must use bias, so we have to use local implementation
-    local_fully_connected_mat_q7_vec_q15_opt(h_tm1, c->recurrent_weights->p_data, 
-            cell->units, cell->units*4, 0, c->oshift_hw, NULL, buf2, NULL); 
+    local_fully_connected_mat_q7_vec_q15_opt((q15_t *)h_tm1, (q7_t *)c->recurrent_weights->p_data, 
+            cell->units, cell->units*4, 0, c->oshift_hw, NULL, (q15_t *)buf2, NULL); 
 
     // z = z1 + z2  -> buf0
     local_add_q15(buf1, buf2, buf0, 0, cell->units*4);
@@ -190,7 +191,7 @@ nnom_status_t lstm_cell_q7_q15_run(nnom_rnn_cell_t* cell)
     local_mult_q15(z[3], buf2, o_state[0], 15, cell->units);
 
     // copy and shift q15 to q7 ** (copy hidden to output)
-    local_q15_to_q7(o_state[0], cell->out_data, 8, cell->units);
+    local_q15_to_q7((q15_t *)o_state[0], (q7_t *)cell->out_data, 8, cell->units);
 	return NN_SUCCESS;
 }
 

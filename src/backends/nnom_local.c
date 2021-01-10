@@ -562,8 +562,8 @@ void local_convolve_CHW_q7_nonsquare(const q7_t *Im_in,                // input 
     }
 }
 
-#define FALSE 0
-#define TRUE 1
+//#define FALSE 0
+//#define TRUE 1
 
 static int alg_deconv2d_calculate_position(
 		int pos,
@@ -1367,7 +1367,7 @@ void local_hard_sigmoid_q7(q7_t *data, uint32_t size, int16_t dec_bit)
 	int16_t mult = 26;  	// 0.2 * 128
 
 	// int bit >= 0
-	for(int i=0; i<size; i++)
+	for(uint32_t i=0; i<size; i++)
 	{
 		if(data[i] <= -limit)
 			data[i] = 0;
@@ -1394,7 +1394,7 @@ void local_hard_tanh_q7(q7_t *data, uint32_t size, int16_t dec_bit)
 	
 	// int bit < 0
 	if(int_bit < 0)
-		for(int i=0; i<size; i++)
+		for(uint32_t i=0; i<size; i++)
 		{
 			if(data[i] <= -limit)
 				data[i] = -128;
@@ -1407,7 +1407,7 @@ void local_hard_tanh_q7(q7_t *data, uint32_t size, int16_t dec_bit)
 		}
 	else
 		// int bit >= 0
-		for(int i=0; i<size; i++)
+		for(uint32_t i=0; i<size; i++)
 		{
 			if(data[i] <= -limit)
 				data[i] = -128;

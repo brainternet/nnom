@@ -124,17 +124,17 @@ nnom_status_t dw_conv2d_run(nnom_layer_t *layer)
 #else	
 	local_depthwise_separable_conv_CHW_q7_nonsquare(
 #endif
-		layer->in->tensor->p_data,
+		(q7_t *)layer->in->tensor->p_data,
 		layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
-		cl->weight->p_data,
+		(q7_t *)cl->weight->p_data,
 		layer->out->tensor->dim[2],
 		cl->kernel.w, cl->kernel.h,
 		cl->pad.w, cl->pad.h,
 		cl->stride.w, cl->stride.h,
 		cl->dilation.w, cl->dilation.h,
-		cl->bias->p_data,
+		(q7_t *)cl->bias->p_data,
 		cl->bias_lshift, cl->output_rshift, cl->weight->qtype,
-		layer->out->tensor->p_data,
+		(q7_t *)layer->out->tensor->p_data,
 		layer->out->tensor->dim[1], layer->out->tensor->dim[0], NULL, NULL);
 	return result;
 }

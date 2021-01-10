@@ -23,7 +23,7 @@ nnom_layer_t * cropping_s(const nnom_cropping_config_t *config)
 {
 	nnom_layer_t *layer = Cropping(config->pad);
 	if(layer)
-		layer->config = (void*) config;
+		layer->config = (nnom_layer_config_t*) config;
 	return layer;
 }
 
@@ -75,13 +75,13 @@ nnom_status_t cropping_run(nnom_layer_t * layer)
 #else
 	local_cropping_HWC_q7(
 #endif	
-						layer->in->tensor->p_data, 
+						(q7_t *)layer->in->tensor->p_data, 
 						layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
 						cl->pad.top,
 						cl->pad.bottom,
 						cl->pad.left,
 						cl->pad.right,
-						layer->out->tensor->p_data,
+						(q7_t *)layer->out->tensor->p_data,
 						layer->out->tensor->dim[1], layer->out->tensor->dim[0]);
 
 	return NN_SUCCESS;

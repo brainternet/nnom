@@ -23,7 +23,7 @@ nnom_layer_t *concat_s(const nnom_concat_config_t *config)
 {
 	nnom_layer_t* layer = Concat(config->axis);
 	if(layer)
-		layer->config = (void*) config;
+		layer->config = (nnom_layer_config_t *) config;
 	return layer;
 }
 
@@ -37,13 +37,13 @@ nnom_layer_t *Concat(int8_t axis)
 
 	// apply a block memory for all the sub handles.
 	mem_size = sizeof(nnom_concat_layer_t) + sizeof(nnom_layer_io_t) * 2;
-	layer = nnom_mem(mem_size);
+	layer = (nnom_concat_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_concat_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_concat_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_CONCAT;
@@ -92,7 +92,7 @@ nnom_status_t concat_build(nnom_layer_t *layer)
 
 	// find out the concated axis
 	num_dim = layer->in->tensor->num_dim;
-	for (uint32_t i = 0; i < num_dim; i ++)
+	for (int32_t i = 0; i < num_dim; i ++)
 	{
 		// exclue the concat axies
 		if (i == cl->axis)
@@ -190,18 +190,18 @@ nnom_status_t concat_run(nnom_layer_t *layer)
 
 	// Concatenate for HWC	
 	uint8_t* pin;
-	uint8_t* pout = layer->out->tensor->p_data;
+	uint8_t* pout = (uint8_t *)layer->out->tensor->p_data;
 	uint32_t block_size;
 	uint32_t n_block;
 	uint8_t num_dim = layer->in->tensor->num_dim;
 
 	// calcualte the number of block to concat. (the other shapes before the concat axis)
 	n_block = 1;
-	for (int i = 0; i < cl->axis; i++)
+	for (int8_t i = 0; i < cl->axis; i++)
 		n_block *= layer->in->tensor->dim[i];
 
 	// concat all input layers
-	for (int i = 0; i < n_block; i++)
+	for (uint32_t i = 0; i < n_block; i++)
 	{
 		in = layer->in;
 		while (in != NULL)

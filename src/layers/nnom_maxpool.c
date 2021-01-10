@@ -43,7 +43,7 @@ nnom_layer_t *maxpool_s(const nnom_pool_config_t * config)
 	}
 	
 	if(layer)
-		layer->config = (void*) config;
+		layer->config = (nnom_layer_config_t *) config;
 	return layer;
 }
 
@@ -55,14 +55,14 @@ nnom_layer_t *MaxPool(nnom_3d_shape_t k, nnom_3d_shape_t s, nnom_padding_t pad_t
 
 	// apply a block memory for all the sub handles.
 	size_t mem_size = sizeof(nnom_maxpool_layer_t) + sizeof(nnom_layer_io_t) * 2 + sizeof(nnom_buf_t);
-	layer = nnom_mem(mem_size);
+	layer = (nnom_maxpool_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_maxpool_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
-	comp = (void *)((uint8_t*)out + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_maxpool_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	comp = (nnom_buf_t *)((uint8_t*)out + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
 	layer->super.type = NNOM_MAXPOOL;
@@ -177,14 +177,14 @@ nnom_status_t maxpool_run(nnom_layer_t *layer)
 	#endif
 	{
 		// CMSIS-NN does not support none-square pooling, we have to use local implementation
-		local_maxpool_q7_HWC(layer->in->tensor->p_data, 				
+		local_maxpool_q7_HWC((q7_t *)layer->in->tensor->p_data, 				
 				layer->in->tensor->dim[1], layer->in->tensor->dim[0], layer->in->tensor->dim[2],
 				cl->kernel.w, cl->kernel.h, 
 				cl->pad.w, cl->pad.h,
 				cl->stride.w, cl->stride.h,
 				out_x, out_y,
 				NULL,
-				layer->out->tensor->p_data);
+				(q7_t *)layer->out->tensor->p_data);
 	}
 #endif // CHW/HWC
 	return NN_SUCCESS;

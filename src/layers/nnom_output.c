@@ -25,7 +25,7 @@ nnom_layer_t *output_s(const nnom_io_config_t* config)
 	nnom_layer_t *layer = input_s(config);
 	if(layer)
 	{
-		layer->config = (void*) config;
+		layer->config = (nnom_layer_config_t *) config;
 		layer->type = NNOM_OUTPUT;
 		layer->run = output_run;
 		layer->build = default_build;

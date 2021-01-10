@@ -25,7 +25,7 @@ nnom_layer_t * global_maxpool_s(const nnom_global_pool_config_t *config)
 	nnom_maxpool_layer_t * cl = (nnom_maxpool_layer_t *)GlobalMaxPool();
 	if(cl)
 	{
-		cl->super.config = (void*) config;
+		cl->super.config = (nnom_layer_config_t *) config;
 		cl->output_shift = config->output_shift;
 	}
 	return (nnom_layer_t *)cl;
@@ -35,7 +35,7 @@ nnom_layer_t * global_avgpool_s(const nnom_global_pool_config_t *config)
 	nnom_maxpool_layer_t * cl = (nnom_maxpool_layer_t *)GlobalAvgPool();
 	if(cl)
 	{
-		cl->super.config = (void*) config;
+		cl->super.config = (nnom_layer_config_t *) config;
 		cl->output_shift = config->output_shift;
 	}
 	return (nnom_layer_t *)cl;
@@ -46,7 +46,7 @@ nnom_layer_t * global_sumpool_s(const nnom_global_pool_config_t *config)
 	nnom_maxpool_layer_t * cl = (nnom_maxpool_layer_t *)GlobalSumPool();
 	if(cl)
 	{
-		cl->super.config = (void*) config;
+		cl->super.config = (nnom_layer_config_t *) config;
 		cl->output_shift = config->output_shift;
 	}
 	return (nnom_layer_t *)cl;

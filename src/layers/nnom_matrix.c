@@ -31,7 +31,7 @@ nnom_layer_t *add_s(const nnom_matrix_config_t * config)
 {
 	nnom_matrix_layer_t *cl = (nnom_matrix_layer_t *) Add(config->output_shift);
 	if(cl)
-		cl->super.config = (void*) config;
+		cl->super.config = (nnom_layer_config_t *) config;
 	return (nnom_layer_t *)cl;
 }
 
@@ -39,7 +39,7 @@ nnom_layer_t *sub_s(const nnom_matrix_config_t * config)
 {
 	nnom_matrix_layer_t *cl = (nnom_matrix_layer_t *) Sub(config->output_shift);
 	if(cl)
-		cl->super.config = (void*) config;
+		cl->super.config = (nnom_layer_config_t *) config;
 	return (nnom_layer_t *)cl;
 }
 
@@ -47,7 +47,7 @@ nnom_layer_t *mult_s(const nnom_matrix_config_t * config)
 {
 	nnom_matrix_layer_t *cl = (nnom_matrix_layer_t *) Mult(config->output_shift);
 	if(cl)
-		cl->super.config = (void*) config;
+		cl->super.config = (nnom_layer_config_t *) config;
 	return (nnom_layer_t *)cl;
 }
 
@@ -98,13 +98,13 @@ nnom_layer_t *_same_shape_matrix_layer()
 
 	// apply a block memory for all the sub handles.
 	mem_size = sizeof(nnom_matrix_layer_t) + sizeof(nnom_layer_io_t) * 2;
-	layer = nnom_mem(mem_size);
+	layer = (nnom_matrix_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_matrix_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_matrix_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
 	//comp = (void *)((uint8_t*)out + sizeof(nnom_layer_io_t));
 
 	// set type in layer parent
@@ -159,16 +159,16 @@ nnom_status_t add_run(nnom_layer_t *layer)
 			arm_add_q7(layer->in->tensor->p_data, layer->in->aux->tensor->p_data, layer->out->tensor->p_data, t_size);
 		else
 		#endif
-			local_add_q7(layer->in->tensor->p_data, layer->in->aux->tensor->p_data, layer->out->tensor->p_data, oshift, t_size);
+			local_add_q7((q7_t *)layer->in->tensor->p_data, (q7_t *)layer->in->aux->tensor->p_data, (q7_t *)layer->out->tensor->p_data, oshift, t_size);
 	}
 	else
 	{	
-		for(int i = 0; i < num_input; i++)
+		for(size_t i = 0; i < num_input; i++)
 		{
-			input_mem_blk[i] = in->tensor->p_data;
+			input_mem_blk[i] = (int8_t *)in->tensor->p_data;
 			in = in->aux;
 		}
-		local_multiple_add_q7(layer->out->tensor->p_data, oshift, t_size, num_input, input_mem_blk);
+		local_multiple_add_q7((q7_t *)layer->out->tensor->p_data, oshift, t_size, num_input, input_mem_blk);
 	}
 
 	return NN_SUCCESS;
@@ -192,16 +192,16 @@ nnom_status_t sub_run(nnom_layer_t *layer)
 			arm_sub_q7(layer->in->tensor->p_data, layer->in->aux->tensor->p_data, layer->out->tensor->p_data, t_size);
 		else
 		#endif
-			local_sub_q7(layer->in->tensor->p_data, layer->in->aux->tensor->p_data, layer->out->tensor->p_data, oshift, t_size);
+			local_sub_q7((q7_t *)layer->in->tensor->p_data, (q7_t *)layer->in->aux->tensor->p_data, (q7_t *)layer->out->tensor->p_data, oshift, t_size);
 	}
 	else
 	{	
-		for(int i = 0; i < num_input; i++)
+		for(size_t i = 0; i < num_input; i++)
 		{
-			input_mem_blk[i] = in->tensor->p_data;
+			input_mem_blk[i] = (int8_t *)in->tensor->p_data;
 			in = in->aux;
 		}
-		local_multiple_sub_q7(layer->out->tensor->p_data, oshift, t_size, num_input, input_mem_blk);
+		local_multiple_sub_q7((q7_t *)layer->out->tensor->p_data, oshift, t_size, num_input, input_mem_blk);
 	}
 	return NN_SUCCESS;
 }
@@ -224,16 +224,16 @@ nnom_status_t mult_run(nnom_layer_t *layer)
 			arm_mult_q7(layer->in->tensor->p_data, layer->in->aux->tensor->p_data, layer->out->tensor->p_data, t_size);
 		else
 		#endif
-			local_mult_q7(layer->in->tensor->p_data, layer->in->aux->tensor->p_data, layer->out->tensor->p_data, oshift, t_size);
+			local_mult_q7((q7_t *)layer->in->tensor->p_data, (q7_t *)layer->in->aux->tensor->p_data, (q7_t *)layer->out->tensor->p_data, oshift, t_size);
 	}
 	else
 	{	
-		for(int i = 0; i < num_input; i++)
+		for(size_t i = 0; i < num_input; i++)
 		{
-			input_mem_blk[i] = in->tensor->p_data;
+			input_mem_blk[i] = (int8_t *)in->tensor->p_data;
 			in = in->aux;
 		}
-		local_multiple_mult_q7(layer->out->tensor->p_data, oshift, t_size, num_input, input_mem_blk);
+		local_multiple_mult_q7((q7_t *)layer->out->tensor->p_data, oshift, t_size, num_input, input_mem_blk);
 	}
 	return NN_SUCCESS;
 }

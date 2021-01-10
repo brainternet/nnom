@@ -27,7 +27,7 @@ nnom_layer_t *lambda_s(const nnom_lambda_config_t * config)
 		config->free_func_name,
 		config->parameters);
 	if(cl)
-		cl->super.config = (void*) config;
+		cl->super.config = (nnom_layer_config_t *) config;
 	return (nnom_layer_t *)cl;
 }
 
@@ -42,13 +42,13 @@ nnom_layer_t *Lambda(nnom_status_t (*run)(nnom_layer_t *),
 
 	// apply a block memory for all the sub handles.
 	size_t mem_size = sizeof(nnom_io_layer_t) + sizeof(nnom_layer_io_t) * 2;
-	layer = nnom_mem(mem_size);
+	layer = (nnom_lambda_layer_t *)nnom_mem(mem_size);
 	if (layer == NULL)
 		return NULL;
 
 	// distribut the memory to sub handles.
-	in = (void *)((uint8_t*)layer + sizeof(nnom_lambda_layer_t));
-	out = (void *)((uint8_t*)in + sizeof(nnom_layer_io_t));
+	in = (nnom_layer_io_t *)((uint8_t*)layer + sizeof(nnom_lambda_layer_t));
+	out = (nnom_layer_io_t *)((uint8_t*)in + sizeof(nnom_layer_io_t));
 
 	// set buf type.
 	in->type = NNOM_TENSOR_BUF_TEMP;
