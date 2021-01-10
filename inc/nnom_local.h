@@ -31,8 +31,8 @@ extern "C" {
 #endif
 
 // SSAT implementation with C code
-#ifndef __NNOM_SSAT
-static inline int __NNOM_SSAT(int32_t value, int32_t bit) {
+#ifndef NNOM_SSAT
+static inline int NNOM_SSAT(int32_t value, int32_t bit) {
     int32_t min = -(1<<(bit-1));
     int32_t max = (1<<(bit-1)) - 1;
     if (value < min)
@@ -45,8 +45,8 @@ static inline int __NNOM_SSAT(int32_t value, int32_t bit) {
 #endif
 
 // USAT implementation with C code
-#ifndef __NNOM_USAT
-static inline int __NNOM_USAT(int32_t value, int32_t bit) {
+#ifndef NNOM_USAT
+static inline int NNOM_USAT(int32_t value, int32_t bit) {
     int32_t max = (1<<(bit-1)) - 1;
     if (value < 0)
         return 0;
@@ -57,8 +57,17 @@ static inline int __NNOM_USAT(int32_t value, int32_t bit) {
 }
 #endif
 
-#define MAX(A, B) ((A) > (B) ? (A) : (B))
-#define MIN(A, B) ((A) < (B) ? (A) : (B))
+//#define MAX(A, B) ((A) > (B) ? (A) : (B))
+//#define MIN(A, B) ((A) < (B) ? (A) : (B))
+#ifndef	MAX
+/* Returns the maximum value of two expressions. */
+#define MAX(x, y) 			(((x) > (y)) ? (x) : (y))
+#endif
+
+#ifndef	MIN
+/* Returns the minimal value of two expressions. */
+#define MIN(x, y) 			(((x) < (y)) ? (x) : (y))
+#endif
 
 
 // Those functions/tables below are partially modifed from CMSIS-NN lib

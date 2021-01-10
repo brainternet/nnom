@@ -488,7 +488,7 @@ void local_convolve_HWC_q7_nonsquare(const q7_t *Im_in,                // input 
                         } 
                     }
                 }
-                Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q7_t)__NNOM_SSAT((conv_out >> out_shift[shift_idx]), 8);
+                Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q7_t)NNOM_SSAT((conv_out >> out_shift[shift_idx]), 8);
             }
         }
     }
@@ -556,7 +556,7 @@ void local_convolve_CHW_q7_nonsquare(const q7_t *Im_in,                // input 
 						}
 					}
 				}
-                Im_out[i * dim_im_out_x * dim_im_out_y + (j * dim_im_out_x + k)] = (q7_t)__NNOM_SSAT((conv_out >> out_shift[shift_idx]), 8);
+                Im_out[i * dim_im_out_x * dim_im_out_y + (j * dim_im_out_x + k)] = (q7_t)NNOM_SSAT((conv_out >> out_shift[shift_idx]), 8);
             }
         }
     }
@@ -661,7 +661,7 @@ void local_conv_trans_HWC_q7_nonsquare(const int8_t * Im_in,
 //                     }
 //                 }
 
-//  				Im_out[oc + (oy * dim_im_out_x + ox) * ch_im_out] = (q7_t) __NNOM_SSAT((conv_out >> out_shift), 8);
+//  				Im_out[oc + (oy * dim_im_out_x + ox) * ch_im_out] = (q7_t) NNOM_SSAT((conv_out >> out_shift), 8);
 //  			}
 //  		}
 //  	}
@@ -683,7 +683,7 @@ void local_conv_trans_HWC_q7_nonsquare(const int8_t * Im_in,
 
 			if(is_zero) {
 				conv_out = ((q31_t)(bias[i]) << bias_shift) + NNOM_ROUND(out_shift);
-				conv_out = (q7_t) __NNOM_SSAT((conv_out >> out_shift), 8);
+				conv_out = (q7_t) NNOM_SSAT((conv_out >> out_shift), 8);
 				for (k = 0; k < dim_im_out_x; k++) {
 					Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q7_t) conv_out;
 				}
@@ -713,7 +713,7 @@ void local_conv_trans_HWC_q7_nonsquare(const int8_t * Im_in,
 					}
 				}
 
-				Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q7_t) __NNOM_SSAT((conv_out >> out_shift), 8);
+				Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q7_t) NNOM_SSAT((conv_out >> out_shift), 8);
 			}
 		}
 	}
@@ -784,7 +784,7 @@ void local_depthwise_separable_conv_HWC_q7_nonsquare(const q7_t *Im_in,// input 
                             conv_out += Im_in[in_pix_loc] * wt[wt_loc];
                         }
                     }
-                    Im_out[i_out++] = (q7_t)__NNOM_SSAT((conv_out >> out_shift[shift_idx]), 8);
+                    Im_out[i_out++] = (q7_t)NNOM_SSAT((conv_out >> out_shift[shift_idx]), 8);
                 }
             }
         }
@@ -856,7 +856,7 @@ void local_depthwise_separable_conv_CHW_q7_nonsquare(const q7_t *Im_in,// input 
                             conv_out += Im_in[in_pix_loc] * wt[wt_loc];
                         }
                     }
-                    Im_out[i_ch_out * dim_im_out_x * dim_im_out_y + (i_out_y * dim_im_out_x + i_out_x)] = (q7_t)__NNOM_SSAT((conv_out >> out_shift[shift_idx]), 8);
+                    Im_out[i_ch_out * dim_im_out_x * dim_im_out_y + (i_out_y * dim_im_out_x + i_out_x)] = (q7_t)NNOM_SSAT((conv_out >> out_shift[shift_idx]), 8);
                 }
             }
         }
@@ -1091,10 +1091,10 @@ void local_dot_q7_opt(const q7_t *pV, // pointer to vector
 
             colCnt--;
         }
-        *pO++ = (q7_t)__NNOM_SSAT((sum >> out_shift), 8);
-        *pO++ = (q7_t)__NNOM_SSAT((sum2 >> out_shift), 8);
-        *pO++ = (q7_t)__NNOM_SSAT((sum3 >> out_shift), 8);
-        *pO++ = (q7_t)__NNOM_SSAT((sum4 >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((sum >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((sum2 >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((sum3 >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((sum4 >> out_shift), 8);
 
         rowCnt--;
     }
@@ -1111,7 +1111,7 @@ void local_dot_q7_opt(const q7_t *pV, // pointer to vector
             q7_t inB = *pB++;
             ip_out += inA * inB;
         }
-        *pO++ = (q7_t)__NNOM_SSAT((ip_out >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((ip_out >> out_shift), 8);
 
         rowCnt--;
     }
@@ -1131,7 +1131,7 @@ void local_dot_q7(const q7_t *pV, // pointer to vector
         {
             ip_out += pV[j] * pM[i * dim_vec + j];
         }
-        pOut[i] = (q7_t)__NNOM_SSAT((ip_out >> out_shift), 8);
+        pOut[i] = (q7_t)NNOM_SSAT((ip_out >> out_shift), 8);
     }
 }
 
@@ -1230,10 +1230,10 @@ void local_fully_connected_q7_opt(const q7_t *pV,               // pointer to ve
 
             colCnt--;
         }
-        *pO++ = (q7_t)__NNOM_SSAT((sum >> out_shift), 8);
-        *pO++ = (q7_t)__NNOM_SSAT((sum2 >> out_shift), 8);
-        *pO++ = (q7_t)__NNOM_SSAT((sum3 >> out_shift), 8);
-        *pO++ = (q7_t)__NNOM_SSAT((sum4 >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((sum >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((sum2 >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((sum3 >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((sum4 >> out_shift), 8);
 
         rowCnt--;
     }
@@ -1255,7 +1255,7 @@ void local_fully_connected_q7_opt(const q7_t *pV,               // pointer to ve
             q7_t inB = *pB++;
             ip_out += inA * inB;
         }
-        *pO++ = (q7_t)__NNOM_SSAT((ip_out >> out_shift), 8);
+        *pO++ = (q7_t)NNOM_SSAT((ip_out >> out_shift), 8);
 
         rowCnt--;
     }
@@ -1279,7 +1279,7 @@ void local_fully_connected_q7(const q7_t *pV,               // pointer to vector
             {
                 ip_out += pV[j] * pM[i * dim_vec + j];
             }
-            pOut[i] = (q7_t)__NNOM_SSAT((ip_out >> out_shift), 8);
+            pOut[i] = (q7_t)NNOM_SSAT((ip_out >> out_shift), 8);
         }
     }
     else
@@ -1291,7 +1291,7 @@ void local_fully_connected_q7(const q7_t *pV,               // pointer to vector
             {
                 ip_out += pV[j] * pM[i * dim_vec + j];
             }
-            pOut[i] = (q7_t)__NNOM_SSAT((ip_out >> out_shift), 8);
+            pOut[i] = (q7_t)NNOM_SSAT((ip_out >> out_shift), 8);
         }
     }
 }
@@ -1327,7 +1327,7 @@ void local_softmax_q7(const q7_t *vec_in, const uint32_t dim_vec, q7_t *p_out)
     {
         if (vec_in[i] > base)
         {
-            shift = (uint8_t)__NNOM_USAT(vec_in[i] - base, 5);
+            shift = (uint8_t)NNOM_USAT(vec_in[i] - base, 5);
             sum += 0x1 << shift;
         }
     }
@@ -1345,8 +1345,8 @@ void local_softmax_q7(const q7_t *vec_in, const uint32_t dim_vec, q7_t *p_out)
         if (vec_in[i] > base)
         {
             /* Here minimum value of 13+base-vec_in[i] will be 5 */
-            shift = (uint8_t)__NNOM_USAT(13 + base - vec_in[i], 5);
-            p_out[i] = (q7_t)__NNOM_SSAT((output_base >> shift), 8);
+            shift = (uint8_t)NNOM_USAT(13 + base - vec_in[i], 5);
+            p_out[i] = (q7_t)NNOM_SSAT((output_base >> shift), 8);
         }
         else
         {
@@ -1545,7 +1545,7 @@ void local_mult_q7(q7_t *pSrcA,
     for (i = 0; i < blockSize; i++)
     {
         q31_t product = pSrcA[i] * pSrcB[i];
-        pDst[i] = (q7_t) __NNOM_SSAT(((product + NNOM_ROUND(out_shift)) >> out_shift), 8);
+        pDst[i] = (q7_t) NNOM_SSAT(((product + NNOM_ROUND(out_shift)) >> out_shift), 8);
     }
 }
 
@@ -1560,7 +1560,7 @@ void local_add_q7(q7_t *pSrcA,
     for (i = 0; i < blockSize; i++)
     {
         q31_t sum = pSrcA[i] + pSrcB[i];
-        pDst[i] = (q7_t) __NNOM_SSAT(((sum + NNOM_ROUND(out_shift)) >> out_shift), 8);
+        pDst[i] = (q7_t) NNOM_SSAT(((sum + NNOM_ROUND(out_shift)) >> out_shift), 8);
     }
 }
 
@@ -1575,7 +1575,7 @@ void local_sub_q7(q7_t *pSrcA,
     for (i = 0; i < blockSize; i++)
     {
         q31_t sub = pSrcA[i] - pSrcB[i];
-        pDst[i] = (q7_t) __NNOM_SSAT(((sub + NNOM_ROUND(out_shift)) >> out_shift), 8);
+        pDst[i] = (q7_t) NNOM_SSAT(((sub + NNOM_ROUND(out_shift)) >> out_shift), 8);
     }
 }
 
@@ -1595,7 +1595,7 @@ void local_multiple_add_q7( q7_t *p_dst,
         sum = 0;
         for(blk=0; blk < num_block; blk++)
             sum += p_src[blk][i];
-        p_dst[i] = (q7_t) __NNOM_SSAT(((sum + NNOM_ROUND(out_shift)) >> out_shift), 8);
+        p_dst[i] = (q7_t) NNOM_SSAT(((sum + NNOM_ROUND(out_shift)) >> out_shift), 8);
     }
 }
 
@@ -1613,7 +1613,7 @@ void local_multiple_mult_q7( q7_t *p_dst,
         product = 1;
         for(blk=0; blk < num_block; blk++)
             product *= p_src[blk][i];
-        p_dst[i] = (q7_t) __NNOM_SSAT(((product + NNOM_ROUND(out_shift)) >> out_shift), 8);
+        p_dst[i] = (q7_t) NNOM_SSAT(((product + NNOM_ROUND(out_shift)) >> out_shift), 8);
     }
 }
 
@@ -1631,7 +1631,7 @@ void local_multiple_sub_q7( q7_t *p_dst,
         sub = p_src[0][i];
         for(blk=1; blk < num_block; blk++)
             sub -= p_src[blk][i];
-        p_dst[i] = (q7_t) __NNOM_SSAT(((sub + NNOM_ROUND(out_shift)) >> out_shift), 8);
+        p_dst[i] = (q7_t) NNOM_SSAT(((sub + NNOM_ROUND(out_shift)) >> out_shift), 8);
     }
 }
 

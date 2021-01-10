@@ -243,7 +243,7 @@ void local_sumpool_q15_HWC(const q15_t *Im_in,           // input image
                     }
                 }
                 // 32bit
-                buf[i_ch_in + ch_im_in * (i_x + i_y * dim_im_out_x)] = (q15_t)__NNOM_SSAT((sum >> output_shift), 16);
+                buf[i_ch_in + ch_im_in * (i_x + i_y * dim_im_out_x)] = (q15_t)NNOM_SSAT((sum >> output_shift), 16);
             }
         }
     }
@@ -321,7 +321,7 @@ void local_sumpool_q15_CHW(const q15_t *Im_in,           // input image
                     }
                 }
                 // 32bit
-                buf[o_ch_offset + (i_x + i_y * dim_im_out_x)] = (q15_t)__NNOM_SSAT((sum >> output_shift), 16);
+                buf[o_ch_offset + (i_x + i_y * dim_im_out_x)] = (q15_t)NNOM_SSAT((sum >> output_shift), 16);
             }
         }
     }
@@ -488,7 +488,7 @@ void local_convolve_HWC_q15_nonsquare(const q15_t *Im_in,                // inpu
                         } 
                     }
                 }
-                Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q15_t)__NNOM_SSAT((conv_out >> out_shift[shift_idx]), 16);
+                Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q15_t)NNOM_SSAT((conv_out >> out_shift[shift_idx]), 16);
             }
         }
     }
@@ -555,7 +555,7 @@ void local_convolve_CHW_q15_nonsquare(const q15_t *Im_in,                // inpu
 						}
 					}
 				}
-                Im_out[i * dim_im_out_x * dim_im_out_y + (j * dim_im_out_x + k)] = (q15_t)__NNOM_SSAT((conv_out >> out_shift[shift_idx]), 16);
+                Im_out[i * dim_im_out_x * dim_im_out_y + (j * dim_im_out_x + k)] = (q15_t)NNOM_SSAT((conv_out >> out_shift[shift_idx]), 16);
             }
         }
     }
@@ -660,7 +660,7 @@ void local_conv_trans_HWC_q15_nonsquare(const int8_t * Im_in,
 //                     }
 //                 }
 
-//  				Im_out[oc + (oy * dim_im_out_x + ox) * ch_im_out] = (q7_t) __NNOM_SSAT((conv_out >> out_shift), 8);
+//  				Im_out[oc + (oy * dim_im_out_x + ox) * ch_im_out] = (q7_t) NNOM_SSAT((conv_out >> out_shift), 8);
 //  			}
 //  		}
 //  	}
@@ -682,7 +682,7 @@ void local_conv_trans_HWC_q15_nonsquare(const int8_t * Im_in,
 
 			if(is_zero) {
 				conv_out = ((q31_t)(bias[i]) << bias_shift) + NNOM_ROUND(out_shift);
-				conv_out = (q15_t) __NNOM_SSAT((conv_out >> out_shift), 16);
+				conv_out = (q15_t) NNOM_SSAT((conv_out >> out_shift), 16);
 				for (k = 0; k < dim_im_out_x; k++) {
 					Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q15_t) conv_out;
 				}
@@ -712,7 +712,7 @@ void local_conv_trans_HWC_q15_nonsquare(const int8_t * Im_in,
 					}
 				}
 
-				Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q15_t) __NNOM_SSAT((conv_out >> out_shift), 16);
+				Im_out[i + (j * dim_im_out_x + k) * ch_im_out] = (q15_t) NNOM_SSAT((conv_out >> out_shift), 16);
 			}
 		}
 	}
@@ -786,7 +786,7 @@ void local_depthwise_separable_conv_HWC_q15_nonsquare(const q15_t *Im_in,// inpu
                             conv_out += Im_in[in_pix_loc] * wt[wt_loc];
                         }
                     }
-                    Im_out[i_out++] = (q15_t)__NNOM_SSAT((conv_out >> out_shift[shift_idx]), 16);
+                    Im_out[i_out++] = (q15_t)NNOM_SSAT((conv_out >> out_shift[shift_idx]), 16);
                 }
             }
         }
@@ -858,7 +858,7 @@ void local_depthwise_separable_conv_CHW_q15_nonsquare(const q15_t *Im_in,// inpu
                         }
                     }
                     Im_out[i_ch_out * dim_im_out_x * dim_im_out_y + (i_out_y * dim_im_out_x + i_out_x)] = 
-                        (q15_t)__NNOM_SSAT((conv_out >> out_shift[shift_idx]), 16);
+                        (q15_t)NNOM_SSAT((conv_out >> out_shift[shift_idx]), 16);
                 }
             }
         }
@@ -1027,7 +1027,7 @@ void local_dot_q15(const q15_t *pV, // pointer to vector
         {
             ip_out += pV[j] * pM[i * dim_vec + j];
         }
-        pOut[i] = (q15_t)__NNOM_SSAT((ip_out >> out_shift), 16);
+        pOut[i] = (q15_t)NNOM_SSAT((ip_out >> out_shift), 16);
     }
 }
 
@@ -1088,10 +1088,10 @@ void local_dot_q15_opt(const q15_t * pV,
             sum4 += inA * inB;
             colCnt--;
         }
-        *pO++ = (q15_t) __NNOM_SSAT((sum >> out_shift), 16);
-        *pO++ = (q15_t) __NNOM_SSAT((sum2 >> out_shift), 16);
-        *pO++ = (q15_t) __NNOM_SSAT((sum3 >> out_shift), 16);
-        *pO++ = (q15_t) __NNOM_SSAT((sum4 >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((sum >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((sum2 >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((sum3 >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((sum4 >> out_shift), 16);
 
         rowCnt--;
     }
@@ -1109,7 +1109,7 @@ void local_dot_q15_opt(const q15_t * pV,
             q15_t     inB = *pB++;
             ip_out += inA * inB;
         }
-        *pO++ = (q15_t) __NNOM_SSAT((ip_out >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((ip_out >> out_shift), 16);
 
         rowCnt--;
     }
@@ -1199,10 +1199,10 @@ void local_fully_connected_mat_q7_vec_q15_opt(const q15_t * pV,
 
             colCnt--;
         }
-        *pO++ = (q15_t) __NNOM_SSAT((sum >> out_shift), 16);
-        *pO++ = (q15_t) __NNOM_SSAT((sum2 >> out_shift), 16);
-        *pO++ = (q15_t) __NNOM_SSAT((sum3 >> out_shift), 16);
-        *pO++ = (q15_t) __NNOM_SSAT((sum4 >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((sum >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((sum2 >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((sum3 >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((sum4 >> out_shift), 16);
 
         rowCnt--;
     }
@@ -1227,7 +1227,7 @@ void local_fully_connected_mat_q7_vec_q15_opt(const q15_t * pV,
             q7_t      inB = *pB++;
             ip_out += inA * inB;
         }
-        *pO++ = (q15_t) __NNOM_SSAT((ip_out >> out_shift), 16);
+        *pO++ = (q15_t) NNOM_SSAT((ip_out >> out_shift), 16);
 
         rowCnt--;
     }
@@ -1255,7 +1255,7 @@ void local_fully_connected_mat_q7_vec_q15(const q15_t * pV,
             {
                 ip_out += pV[j] * pM[i * dim_vec + j];
             }
-            pOut[i] = (q15_t) __NNOM_SSAT((ip_out >> out_shift), 16);
+            pOut[i] = (q15_t) NNOM_SSAT((ip_out >> out_shift), 16);
         }
     }
     else
@@ -1267,7 +1267,7 @@ void local_fully_connected_mat_q7_vec_q15(const q15_t * pV,
             {
                 ip_out += pV[j] * pM[i * dim_vec + j];
             }
-            pOut[i] = (q15_t) __NNOM_SSAT((ip_out >> out_shift), 16);
+            pOut[i] = (q15_t) NNOM_SSAT((ip_out >> out_shift), 16);
         }
     }
 }
@@ -1301,7 +1301,7 @@ void local_softmax_q15(const q15_t * vec_in, const uint16_t dim_vec, q15_t * p_o
     {
         if (vec_in[i] > base)
         {
-            shift = (uint8_t)__NNOM_USAT(vec_in[i] - base, 5);
+            shift = (uint8_t)NNOM_USAT(vec_in[i] - base, 5);
             sum += 0x1 << shift;
         }
     }
@@ -1319,8 +1319,8 @@ void local_softmax_q15(const q15_t * vec_in, const uint16_t dim_vec, q15_t * p_o
         if (vec_in[i] > base)
         {
             /* Here minimum value of 17+base-vec[i] will be 1 */
-            shift = (uint8_t)__NNOM_USAT(17+base-vec_in[i], 5);
-            p_out[i] = (q15_t) __NNOM_SSAT((output_base >> shift), 16);
+            shift = (uint8_t)NNOM_USAT(17+base-vec_in[i], 5);
+            p_out[i] = (q15_t) NNOM_SSAT((output_base >> shift), 16);
         } else
         {
             p_out[i] = 0;
@@ -1489,7 +1489,7 @@ void local_mult_q15(q15_t *pSrcA,
     for (i = 0; i < blockSize; i++)
     {
         q31_t product = pSrcA[i] * pSrcB[i];
-        pDst[i] = (q15_t) __NNOM_SSAT(((product + NNOM_ROUND(out_shift)) >> out_shift), 16);
+        pDst[i] = (q15_t) NNOM_SSAT(((product + NNOM_ROUND(out_shift)) >> out_shift), 16);
     }
 }
 
@@ -1504,7 +1504,7 @@ void local_add_q15(q15_t *pSrcA,
     for (i = 0; i < blockSize; i++)
     {
         q31_t sum = pSrcA[i] + pSrcB[i];
-        pDst[i] = (q15_t) __NNOM_SSAT(((sum + NNOM_ROUND(out_shift)) >> out_shift), 16);
+        pDst[i] = (q15_t) NNOM_SSAT(((sum + NNOM_ROUND(out_shift)) >> out_shift), 16);
     }
 }
 
@@ -1519,7 +1519,7 @@ void local_sub_q15(q15_t *pSrcA,
     for (i = 0; i < blockSize; i++)
     {
         q31_t sub = pSrcA[i] - pSrcB[i];
-        pDst[i] = (q15_t) __NNOM_SSAT(((sub + NNOM_ROUND(out_shift)) >> out_shift), 16);
+        pDst[i] = (q15_t) NNOM_SSAT(((sub + NNOM_ROUND(out_shift)) >> out_shift), 16);
     }
 }
 
@@ -1538,7 +1538,7 @@ void local_multiple_add_q15( q15_t *p_dst,
         sum = 0;
         for(blk=0; blk < num_block; blk++)
             sum += p_src[blk][i];
-        p_dst[i] = (q15_t) __NNOM_SSAT(((sum + NNOM_ROUND(out_shift)) >> out_shift), 16);
+        p_dst[i] = (q15_t) NNOM_SSAT(((sum + NNOM_ROUND(out_shift)) >> out_shift), 16);
     }
 }
 
@@ -1556,7 +1556,7 @@ void local_multiple_mult_q15( q15_t *p_dst,
         product = 1;
         for(blk=0; blk < num_block; blk++)
             product *= p_src[blk][i];
-        p_dst[i] = (q15_t) __NNOM_SSAT(((product + NNOM_ROUND(out_shift)) >> out_shift), 16);
+        p_dst[i] = (q15_t) NNOM_SSAT(((product + NNOM_ROUND(out_shift)) >> out_shift), 16);
     }
 }
 
@@ -1574,7 +1574,7 @@ void local_multiple_sub_q15( q15_t *p_dst,
         sub = p_src[0][i];
         for(blk=1; blk < num_block; blk++)
             sub -= p_src[blk][i];
-        p_dst[i] = (q15_t) __NNOM_SSAT(((sub + NNOM_ROUND(out_shift)) >> out_shift), 16);
+        p_dst[i] = (q15_t) NNOM_SSAT(((sub + NNOM_ROUND(out_shift)) >> out_shift), 16);
     }
 }
 
